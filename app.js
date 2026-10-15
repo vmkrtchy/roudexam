@@ -11,7 +11,11 @@ const GROUP_INFO = {
   8: 'Արագություն և ուղևորների տեղափոխում',
   9: 'Լուսացույցներ և հատուկ ազդանշաններ',
   10: 'Առաջին բուժօգնություն',
+  11: 'Տեսողության և ընկալման ստուգում (նկարներով)',
 };
+
+// հարցեր թեմաների համար՝ ԵՃ կանոններ + հոգեբանական թեստեր
+const TOPIC_QUESTIONS = QUESTIONS.concat(typeof PSYCHO !== 'undefined' ? PSYCHO : []);
 
 const EXAM_COUNT = 20;
 const EXAM_TIME_SEC = 20 * 60;
@@ -60,14 +64,15 @@ function render() {
 
 function renderHome() {
   const counts = {};
-  for (const q of QUESTIONS) counts[q.group] = (counts[q.group] || 0) + 1;
+  for (const q of TOPIC_QUESTIONS) counts[q.group] = (counts[q.group] || 0) + 1;
 
   let topics = '';
-  for (let g = 1; g <= 10; g++) {
+  for (let g = 1; g <= 11; g++) {
+    const name = g <= 10 ? `Խումբ ${g}` : '🧠 Հոգեբանական թեստեր';
     topics += `
       <button class="topic-card" onclick="startTopic(${g})">
         <span>
-          <span class="name">Խումբ ${g}</span>
+          <span class="name">${name}</span>
           <span class="desc" style="display:block">${esc(GROUP_INFO[g])}</span>
         </span>
         <span class="count">${counts[g] || 0} հարց</span>
@@ -93,14 +98,14 @@ function renderHome() {
       </div>
       <div class="section-title">Թեմաներ ըստ խմբերի</div>
       <div class="topics">${topics}</div>
-      <div class="footer">Հարցերը՝ roadpolice.am պաշտոնական հարցաշարից (A, B, C կարգեր)</div>
+      <div class="footer">Հարցերը՝ roadpolice.am պաշտոնական հարցաշարից (A, B, C կարգեր) · Հոգեբանական թեստերը՝ varord.am-ից</div>
     </div>`;
 }
 
 function startTopic(group) {
   state.config = {
-    title: 'Խումբ ' + group,
-    questions: shuffle(QUESTIONS.filter(q => q.group === group)),
+    title: group <= 10 ? 'Խումբ ' + group : 'Հոգեբանական թեստեր',
+    questions: shuffle(TOPIC_QUESTIONS.filter(q => q.group === group)),
     mode: 'practice',
   };
   state.retry = () => startTopic(group);
