@@ -100,7 +100,7 @@ function renderHome() {
 function startTopic(group) {
   state.config = {
     title: 'Խումբ ' + group,
-    questions: QUESTIONS.filter(q => q.group === group),
+    questions: shuffle(QUESTIONS.filter(q => q.group === group)),
     mode: 'practice',
   };
   state.retry = () => startTopic(group);
@@ -270,6 +270,13 @@ function quitQuiz() {
   render();
 }
 
+function gradeOf(pct) {
+  if (pct >= 90) return { label: 'Գերազանց', emoji: '🏆', cls: 'g-excellent' };
+  if (pct >= 75) return { label: 'Լավ', emoji: '👍', cls: 'g-good' };
+  if (pct >= 60) return { label: 'Բավարար', emoji: '🙂', cls: 'g-fair' };
+  return { label: 'Անբավարար · պետք է կրկնել', emoji: '📖', cls: 'g-poor' };
+}
+
 function renderResults() {
   const records = state.records;
   const total = records.length;
@@ -277,6 +284,9 @@ function renderResults() {
   const wrong = records.filter(r => !r.correct && r.picked !== null);
   const skipped = records.filter(r => r.picked === null);
   const pct = total ? Math.round((correct / total) * 100) : 0;
+  const grade = gradeOf(pct);
+  const isExam = state.config.mode === 'exam';
+  const examPassed = wrong.length + skipped.length <= 2;
 
   const mistakes = wrong.map((r, i) => {
     const q = r.question;
@@ -297,6 +307,10 @@ function renderResults() {
         <h1 style="font-size:clamp(20px,4.5vw,28px)">Արդյունք · ${esc(state.config.title)}</h1>
       </header>
       <div class="result-card">
+        ${isExam
+          ? `<div class="grade-badge ${examPassed ? 'g-excellent' : 'g-poor'}">${examPassed ? '✅ Քննությունը հանձնած է' : '❌ Քննությունը չի հանձնած'}</div>
+             <div class="grade-note">Անցողիկ չափանիշ՝ առավելագույնը 2 սխալ</div>`
+          : `<div class="grade-badge ${grade.cls}">${grade.emoji} ${grade.label}</div>`}
         <div class="result-score">${correct}<small> / ${total}</small></div>
         <div class="result-pct">${pct}% ճիշտ</div>
         <div class="progress"><div style="width:${pct}%"></div></div>
