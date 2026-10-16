@@ -500,7 +500,8 @@ function renderQuiz() {
       </div>`;
   } else if (answered && !isExam) {
     const ok = state.picked === q.answer;
-    const expl = q.expl ? `<div class="expl">💡 ${esc(q.expl)}</div>` : '';
+    const explText = q.expl || (typeof EXPL !== 'undefined' ? EXPL[qkey(q)] : null);
+    const expl = explText ? `<div class="expl">💡 ${esc(explText)}</div>` : '';
     if (isBlitz) {
       footer = `
         <div class="qfooter">
@@ -700,6 +701,7 @@ function renderResults() {
   const mistakesHtml = wrong.map((r) => {
     const q = r.question;
     const imgs = q.images.map(src => `<img src="${esc(src)}" alt="" loading="lazy">`).join('');
+    const explText = q.expl || (typeof EXPL !== 'undefined' ? EXPL[qkey(q)] : null);
     return `
       <div class="mistake-card">
         <div class="qmeta">Խումբ ${q.group} · Հարց ${q.num}</div>
@@ -707,6 +709,7 @@ function renderResults() {
         ${imgs ? `<div class="qimages">${imgs}</div>` : ''}
         <div class="mrow bad">✗ Քո պատասխանը՝ ${r.picked}. ${esc(q.options[r.picked - 1] || '')}</div>
         <div class="mrow ok">✓ Ճիշտը՝ ${q.answer}. ${esc(q.options[q.answer - 1])}</div>
+        ${explText ? `<div class="expl">💡 ${esc(explText)}</div>` : ''}
       </div>`;
   }).join('');
 
