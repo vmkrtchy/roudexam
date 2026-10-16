@@ -24,8 +24,9 @@ const app = document.getElementById('app');
 
 // ---------- state ----------
 let state = {
-  screen: 'home',      // home | quiz | results
+  screen: 'home',      // home | order | quiz | results
   config: null,        // { title, questions, mode, timeLimitSec }
+  pending: null,       // { type: 'all' } | { type: 'topic', group }
   index: 0,
   picked: null,
   records: [],         // { question, picked, correct }
@@ -57,6 +58,7 @@ function fmtTime(sec) {
 function render() {
   if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
   if (state.screen === 'home') renderHome();
+  else if (state.screen === 'order') renderOrder();
   else if (state.screen === 'quiz') renderQuiz();
   else renderResults();
   window.scrollTo(0, 0);
@@ -92,8 +94,8 @@ function renderHome() {
           <span class="s">${EXAM_COUNT} պատահական հարց · ${EXAM_TIME_SEC / 60} րոպե · արդյունքը վերջում</span>
         </button>
         <button class="big-btn all" onclick="startAll()">
-          <span class="t">📚 Բոլոր հարցերը</span>
-          <span class="s">${QUESTIONS.length} հարց խառնված · ազատ պարապմունք</span>
+          <span class="t">📝 Սկսել թեստը</span>
+          <span class="s">${QUESTIONS.length} հարց · խառը կամ կարգով — քո ընտրությամբ</span>
         </button>
       </div>
       <div class="section-title">Թեմաներ ըստ խմբերի</div>
@@ -103,18 +105,63 @@ function renderHome() {
 }
 
 function startTopic(group) {
-  state.config = {
-    title: group <= 10 ? 'Խումբ ' + group : 'Հոգեբանական թեստեր',
-    questions: shuffle(TOPIC_QUESTIONS.filter(q => q.group === group)),
-    mode: 'practice',
-  };
-  state.retry = () => startTopic(group);
-  beginQuiz();
+  state.pending = { type: 'topic', group };
+  state.screen = 'order';
+  render();
 }
 
 function startAll() {
-  state.config = { title: 'Բոլոր հարցերը', questions: shuffle(QUESTIONS), mode: 'practice' };
-  state.retry = startAll;
+  state.pending = { type: 'all' };
+  state.screen = 'order';
+  render();
+}
+
+function renderOrder() {
+  const p = state.pending;
+  const title = p.type === 'all'
+    ? 'Բոլոր հարցերը'
+    : (p.group <= 10 ? 'Խումբ ' + p.group : 'Հոգեբանական թեստեր');
+  const count = p.type === 'all'
+    ? QUESTIONS.length
+    : TOPIC_QUESTIONS.filter(q => q.group === p.group).length;
+
+  app.innerHTML = `
+    <div class="container">
+      <div class="topbar">
+        <div class="topbar-row">
+          <button class="quit-btn" onclick="quitQuiz()">← Հետ</button>
+        </div>
+      </div>
+      <header class="home-header">
+        <h1>Սկսել թեստը</h1>
+        <p>${esc(title)} · ${count} հարց · ընտրիր հարցերի կարգը</p>
+      </header>
+      <div class="big-actions">
+        <button class="big-btn exam" onclick="startWithOrder(true)">
+          <span class="t">🔀 Խառը հարցերով</span>
+          <span class="s">Հարցերը պատահական կարգով</span>
+        </button>
+        <button class="big-btn all" onclick="startWithOrder(false)">
+          <span class="t">🔢 Կարգով</span>
+          <span class="s">Հարցերը հաջորդական՝ № 1-ից սկսած</span>
+        </button>
+      </div>
+    </div>`;
+}
+
+function startWithOrder(shuffled) {
+  const p = state.pending;
+  let questions, title;
+  if (p.type === 'all') {
+    questions = shuffled ? shuffle(QUESTIONS) : QUESTIONS.slice();
+    title = 'Բոլոր հարցերը';
+  } else {
+    const list = TOPIC_QUESTIONS.filter(q => q.group === p.group);
+    questions = shuffled ? shuffle(list) : list;
+    title = p.group <= 10 ? 'Խումբ ' + p.group : 'Հոգեբանական թեստեր';
+  }
+  state.config = { title, questions, mode: 'practice', ordered: !shuffled };
+  state.retry = () => startWithOrder(shuffled);
   beginQuiz();
 }
 
@@ -336,6 +383,7 @@ function renderResults() {
 // expose for inline handlers
 window.startTopic = startTopic;
 window.startAll = startAll;
+window.startWithOrder = startWithOrder;
 window.startExam = startExam;
 window.pick = pick;
 window.next = next;
