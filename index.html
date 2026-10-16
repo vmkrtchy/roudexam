@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Վարորդական քննություն · A B C հարցաշար + հոգեբանական թեստեր</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2456e0" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,5 +16,10 @@
   <script src="data.js"></script>
   <script src="psycho.js"></script>
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
 </body>
 </html>

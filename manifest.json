@@ -1,0 +1,12 @@
+{
+  "name": "Վարորդական Քննություն",
+  "short_name": "Քննություն",
+  "description": "Վարորդական քննության հարցաշար A · B · C կարգերի համար՝ ուսուցողական ռեժիմներով",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#eef1f7",
+  "theme_color": "#2456e0",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
