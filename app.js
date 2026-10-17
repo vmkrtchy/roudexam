@@ -677,6 +677,161 @@ function gradeOf(pct) {
   return { label: 'Անբավարար · պետք է կրկնել', emoji: '📖', cls: 'g-poor' };
 }
 
+// ---------- share result card ----------
+function shareResult() {
+  const records = state.records;
+  const total = records.length;
+  const correct = records.filter(r => r.correct).length;
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const wrong = records.filter(r => !r.correct && r.picked !== null).length;
+  const skipped = total - correct - wrong;
+  const isExam = state.config.mode === 'exam';
+  const passed = isExam && wrong + skipped <= 2;
+  const grade = gradeOf(pct);
+
+  const W = 1080, H = 1350;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  const F = '-apple-system, "Noto Sans Armenian", "Segoe UI", sans-serif';
+
+  function rr(px, py, w, h, r) {
+    x.beginPath();
+    x.moveTo(px + r, py);
+    x.arcTo(px + w, py, px + w, py + h, r);
+    x.arcTo(px + w, py + h, px, py + h, r);
+    x.arcTo(px, py + h, px, py, r);
+    x.arcTo(px, py, px + w, py, r);
+    x.closePath();
+  }
+
+  // ֆոն
+  const bg = x.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0b0e16');
+  bg.addColorStop(1, '#131a2b');
+  x.fillStyle = bg;
+  x.fillRect(0, 0, W, H);
+  const g1 = x.createRadialGradient(W * .85, H * .06, 0, W * .85, H * .06, 620);
+  g1.addColorStop(0, 'rgba(106,61,240,.35)');
+  g1.addColorStop(1, 'rgba(106,61,240,0)');
+  x.fillStyle = g1;
+  x.fillRect(0, 0, W, H);
+  const g2 = x.createRadialGradient(W * .08, H * .98, 0, W * .08, H * .98, 620);
+  g2.addColorStop(0, 'rgba(36,86,224,.35)');
+  g2.addColorStop(1, 'rgba(36,86,224,0)');
+  x.fillStyle = g2;
+  x.fillRect(0, 0, W, H);
+
+  x.textAlign = 'center';
+  x.textBaseline = 'alphabetic';
+
+  // վերնագիվ badge
+  x.font = '700 32px ' + F;
+  x.fillStyle = 'rgba(255,255,255,.72)';
+  x.fillText('ՎԱՐՈՐԴԱԿԱՆ ՔՆՆՈՒԹՅՈՒՆ · A·B·C ԿԱՐԳԵՐ', W / 2, 110);
+
+  // լուսացույց (կանաչ՝ վառ)
+  const lw = 150, lh = 330, lx = W / 2 - lw / 2, ly = 175;
+  x.fillStyle = 'rgba(23,28,40,.92)';
+  rr(lx, ly, lw, lh, 40); x.fill();
+  x.strokeStyle = 'rgba(255,255,255,.12)';
+  x.lineWidth = 3;
+  rr(lx, ly, lw, lh, 40); x.stroke();
+  const cols = ['#2a3244', '#2a3244', '#22c55e'];
+  for (let i = 0; i < 3; i++) {
+    const cy = ly + 80 + i * 85;
+    x.beginPath();
+    x.arc(W / 2, cy, 32, 0, Math.PI * 2);
+    if (i === 2) {
+      x.shadowColor = 'rgba(34,197,94,.85)';
+      x.shadowBlur = 42;
+    }
+    x.fillStyle = cols[i];
+    x.fill();
+    x.shadowBlur = 0;
+  }
+
+  // գնահատական
+  const label = isExam
+    ? (passed ? '✅ ՔՆՆՈՒԹՅՈՒՆԸ ՀԱՆձՆԱԾ Է' : '❌ ՔՆՆՈՒԹՅՈՒՆԸ ՉԻ ՀԱՆձՆԱԾ')
+    : grade.emoji + ' ' + grade.label;
+  const col = isExam ? (passed ? '#22c55e' : '#dc2626')
+    : (pct >= 90 ? '#22c55e' : pct >= 75 ? '#7c9bff' : pct >= 60 ? '#d97706' : '#dc2626');
+  x.font = '800 54px ' + F;
+  x.fillStyle = col;
+  x.fillText(label, W / 2, 645);
+
+  // հիմնական արդյունք
+  x.font = '800 175px ' + F;
+  x.fillStyle = '#ffffff';
+  x.fillText(correct + '/' + total, W / 2, 845);
+  x.font = '700 48px ' + F;
+  x.fillStyle = 'rgba(255,255,255,.75)';
+  x.fillText(pct + '% ճիշտ', W / 2, 925);
+
+  // պրոգրես-գոտի
+  const bw = 640, bh = 26, bx = W / 2 - bw / 2, by = 960;
+  x.fillStyle = 'rgba(255,255,255,.10)';
+  rr(bx, by, bw, bh, 13); x.fill();
+  if (pct > 0) {
+    const fg = x.createLinearGradient(bx, 0, bx + bw, 0);
+    fg.addColorStop(0, '#2456e0');
+    fg.addColorStop(1, '#6a3df0');
+    x.fillStyle = fg;
+    rr(bx, by, Math.max(bh, bw * pct / 100), bh, 13); x.fill();
+  }
+
+  // մանրամասներ
+  x.font = '600 34px ' + F;
+  x.fillStyle = 'rgba(255,255,255,.65)';
+  let det = '✓ ' + correct + ' ճիշտ · ✗ ' + wrong + ' սխալ';
+  if (skipped) det += ' · − ' + skipped + ' չպատասխանած';
+  x.fillText(det, W / 2, 1060);
+
+  // ամսաթիվ (ձեռքով՝ որ չկախված լինի սարքի լոկալից)
+  const MN = ['հունվարի', 'փետրվարի', 'մարտի', 'ապրիլի', 'մայիսի', 'հունիսի',
+    'հուլիսի', 'օգոստոսի', 'սեպտեմբերի', 'հոկտեմբերի', 'նոյեմբերի', 'դեկտեմբերի'];
+  const d = new Date();
+  const dstr = d.getDate() + ' ' + MN[d.getMonth()] + ' ' + d.getFullYear() + ' թ.';
+  x.font = '500 30px ' + F;
+  x.fillStyle = 'rgba(255,255,255,.45)';
+  x.fillText(dstr, W / 2, 1130);
+  x.fillText('Լուսի · roadpolice.am հարցաշար', W / 2, 1185);
+
+  // ճանապարհ + մեքենա
+  const ry = H - 90;
+  x.fillStyle = '#10141f';
+  x.fillRect(0, ry, W, 90);
+  x.strokeStyle = 'rgba(251,191,36,.85)';
+  x.lineWidth = 5;
+  x.setLineDash([36, 30]);
+  x.beginPath();
+  x.moveTo(0, ry + 45);
+  x.lineTo(W, ry + 45);
+  x.stroke();
+  x.setLineDash([]);
+  x.font = '58px serif';
+  x.fillText('🚗', W - 150, ry + 63);
+
+  // կիսում կամ ներբեռնում
+  cv.toBlob((blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'roudexam-result.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Քննության արդյունք', text: 'Իմ արդյունքը՝ ' + correct + '/' + total + ' (' + pct + '%)' }).catch(() => { });
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'roudexam-result.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast('📥 Պատկերը ներբեռնվեց');
+    }
+  }, 'image/png');
+
+  return cv;
+}
+
 function renderResults() {
   const records = state.records;
   const total = records.length;
@@ -743,6 +898,7 @@ function renderResults() {
         <div class="result-actions">
           <button class="btn" onclick="state.retry()">↻ Կրկնել</button>
           ${wrong.length ? '<button class="btn ghost" onclick="startMistakes()">📕 Կրկնել սխալները</button>' : ''}
+          ${isExam ? '<button class="btn ghost" onclick="shareResult()">📤 Կիսվել</button>' : ''}
           <button class="btn ghost" onclick="quitQuiz()">🏠 Գլխավոր էջ</button>
         </div>
       </div>
@@ -771,6 +927,7 @@ window.startBlitz = startBlitz;
 window.startReview = startReview;
 window.startMistakes = startMistakes;
 window.startWeak = startWeak;
+window.shareResult = shareResult;
 window.pick = pick;
 window.next = next;
 window.nextReview = nextReview;
