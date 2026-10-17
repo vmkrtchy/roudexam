@@ -50,15 +50,15 @@ let achievements = load('roudexam.achievements', {});  // id -> true
 let settings = load('roudexam.settings', { theme: 'light' });
 
 const ACHIEVEMENTS = [
-  { id: 'first10',     emoji: '🌱', name: 'Առաջին քայլերը',    desc: '10 ճիշտ պատասխան' },
-  { id: 'correct100',  emoji: '💯', name: 'Հարյուրավոր',       desc: '100 ճիշտ պատասխան' },
-  { id: 'correct500',  emoji: '🚀', name: 'Անխոհեմ',           desc: '500 ճիշտ պատասխան' },
-  { id: 'examPass',    emoji: '🎓', name: 'Հանձնած է',          desc: 'Առաջին հանձնած քննությունը' },
-  { id: 'perfectExam', emoji: '💎', name: 'Կատարյալ',           desc: 'Քննություն առանց սխալի' },
-  { id: 'marathon10',  emoji: '🏃', name: 'Մարաթոնցի',          desc: '10+ անընդմեջ ճիշտ մարաթոնում' },
-  { id: 'marathon25',  emoji: '🦄', name: 'Լեգենդ',             desc: '25+ անընդմեջ ճիշտ մարաթոնում' },
-  { id: 'streak3',     emoji: '🔥', name: 'Կրակն անջնջելի',    desc: '3+ օր անըդմեջ պարապմունք' },
-  { id: 'allGroups',   emoji: '🗺️', name: 'Հետազոտող',          desc: 'Պատասխանել բոլոր 11 խմբերից' },
+  { id: 'first10', emoji: '🌱', name: 'Առաջին քայլերը', desc: '10 ճիշտ պատասխան' },
+  { id: 'correct100', emoji: '💯', name: 'Հարյուրավոր', desc: '100 ճիշտ պատասխան' },
+  { id: 'correct500', emoji: '🚀', name: 'Անխոհեմ', desc: '500 ճիշտ պատասխան' },
+  { id: 'examPass', emoji: '🎓', name: 'Հանձնած է', desc: 'Առաջին հանձնած քննությունը' },
+  { id: 'perfectExam', emoji: '💎', name: 'Կատարյալ', desc: 'Քննություն առանց սխալի' },
+  { id: 'marathon10', emoji: '🏃', name: 'Մարաթոնցի', desc: '10+ անընդմեջ ճիշտ մարաթոնում' },
+  { id: 'marathon25', emoji: '🦄', name: 'Լեգենդ', desc: '25+ անընդմեջ ճիշտ մարաթոնում' },
+  { id: 'streak3', emoji: '🔥', name: 'Կրակն անջնջելի', desc: '3+ օր անըդմեջ պարապմունք' },
+  { id: 'allGroups', emoji: '🗺️', name: 'Հետազոտող', desc: 'Պատասխանել բոլոր 11 խմբերից' },
 ];
 
 function qkey(q) { return q.group + ':' + q.num; }
