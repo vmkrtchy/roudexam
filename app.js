@@ -779,3 +779,21 @@ window.quitQuiz = quitQuiz;
 window.state = state;
 
 render();
+
+// ---------- welcome splash ----------
+(function initSplash() {
+  const el = document.getElementById('splash');
+  if (!el) return;
+  document.body.classList.add('no-scroll');
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    el.classList.add('hide');
+    document.body.classList.remove('no-scroll');
+    setTimeout(() => el.remove(), 700);
+  };
+  el.addEventListener('click', close);
+  // #splash hash-ով բացելիս էկրանը չի փակվում ավտոմատ (դիտելու համար)
+  if (location.hash !== '#splash') setTimeout(close, 3800);
+})();

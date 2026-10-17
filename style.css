@@ -918,3 +918,254 @@ body.dark .toast {
 body.dark .qimages img {
   background: #fff;
 }
+
+/* ---------- welcome splash ---------- */
+body.no-scroll {
+  overflow: hidden;
+}
+
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(106, 61, 240, .25), transparent 60%),
+    radial-gradient(700px 400px at 50% 115%, rgba(36, 86, 224, .30), transparent 60%),
+    #0b0e16;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity .65s ease, transform .65s ease, visibility .65s;
+}
+
+#splash.hide {
+  opacity: 0;
+  transform: scale(1.05);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* traffic light */
+.sp-light {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #171c28;
+  border: 1px solid #2b3244;
+  padding: 16px 14px;
+  border-radius: 22px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .5), inset 0 2px 6px rgba(255, 255, 255, .04);
+  margin-bottom: 30px;
+  animation: spFloat 4s ease-in-out infinite;
+}
+
+.sp-light span {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #232a3a;
+  border: 2px solid #303950;
+}
+
+.sp-light .r {
+  animation: spRed 2.4s ease forwards;
+}
+
+.sp-light .y {
+  animation: spYel 2.4s ease forwards;
+}
+
+.sp-light .g {
+  animation: spGrn 2.4s ease forwards;
+}
+
+@keyframes spRed {
+
+  0%, 30% {
+    background: #ef4444;
+    border-color: #ef4444;
+    box-shadow: 0 0 26px 6px rgba(239, 68, 68, .55);
+  }
+
+  32%, 100% {
+    background: #232a3a;
+    border-color: #303950;
+    box-shadow: none;
+  }
+}
+
+@keyframes spYel {
+
+  0%, 30% {
+    background: #232a3a;
+    border-color: #303950;
+    box-shadow: none;
+  }
+
+  32%, 55% {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    box-shadow: 0 0 26px 6px rgba(245, 158, 11, .55);
+  }
+
+  57%, 100% {
+    background: #232a3a;
+    border-color: #303950;
+    box-shadow: none;
+  }
+}
+
+@keyframes spGrn {
+
+  0%, 55% {
+    background: #232a3a;
+    border-color: #303950;
+    box-shadow: none;
+  }
+
+  57%, 100% {
+    background: #22c55e;
+    border-color: #22c55e;
+    box-shadow: 0 0 30px 8px rgba(34, 197, 94, .6);
+  }
+}
+
+@keyframes spFloat {
+
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* text */
+.sp-title {
+  font-size: clamp(26px, 6vw, 44px);
+  font-weight: 800;
+  letter-spacing: .5px;
+  opacity: 0;
+  animation: spRise .9s ease 1.5s forwards;
+}
+
+.sp-name {
+  font-size: clamp(54px, 14vw, 110px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.05;
+  background: linear-gradient(100deg, #7c9bff, #b79bff, #7dd3fc, #7c9bff);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 30px rgba(124, 155, 255, .45));
+  opacity: 0;
+  animation: spRise .9s cubic-bezier(.2, .9, .3, 1.2) 1.9s forwards, spShimmer 5s linear 2.8s infinite;
+}
+
+.sp-sub {
+  margin-top: 10px;
+  color: #9aa5bd;
+  font-size: clamp(13px, 2.6vw, 16px);
+  opacity: 0;
+  animation: spRise .8s ease 2.4s forwards;
+}
+
+.sp-skip {
+  position: absolute;
+  bottom: 96px;
+  left: 0;
+  right: 0;
+  color: #6b7690;
+  font-size: 12px;
+  letter-spacing: .4px;
+  opacity: 0;
+  animation: spRise .8s ease 3s forwards;
+}
+
+@keyframes spRise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spShimmer {
+  to {
+    background-position: 220% 0;
+  }
+}
+
+/* road + car */
+.sp-road {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 84px;
+  background: #10141f;
+  border-top: 1px solid #232b3d;
+  overflow: hidden;
+}
+
+.sp-lane {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(90deg, #fbbf24 0 34px, transparent 34px 62px);
+  opacity: .8;
+  animation: spLane 1s linear infinite;
+}
+
+@keyframes spLane {
+  to {
+    background-position: 62px 0;
+  }
+}
+
+.sp-car {
+  position: absolute;
+  top: 50%;
+  left: -90px;
+  transform: translateY(-58%);
+  font-size: 44px;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, .35));
+  animation: spDrive 3.4s cubic-bezier(.45, .05, .55, .95) .2s forwards;
+}
+
+@keyframes spDrive {
+  0% {
+    left: -90px;
+  }
+
+  100% {
+    left: 110%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .sp-light span, .sp-light, .sp-lane, .sp-car {
+    animation-duration: .01s !important;
+    animation-delay: 0s !important;
+  }
+
+  .sp-title, .sp-name, .sp-sub, .sp-skip {
+    animation-delay: .1s !important;
+  }
+}
